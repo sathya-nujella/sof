@@ -25,6 +25,7 @@
 #include <sof/lib/mailbox.h>
 #include <sof/lib/memory.h>
 #include <sof/lib/notifier.h>
+#include <sof/lib/pm_runtime.h>
 #include <sof/schedule/edf_schedule.h>
 #include <sof/schedule/ll_schedule.h>
 #include <sof/trace/dma-trace.h>
@@ -395,6 +396,11 @@ int platform_init(struct sof *sof)
 	struct spi *spi_dev;
 #endif
 	int ret;
+
+	/* pm runtime already initialized, request the DSP to stay in D0
+	 * until we are allowed to do full power gating (by the IPC req).
+	 */
+	pm_runtime_get(DSP_D0, 0);
 
 #if CONFIG_CANNONLAKE || CONFIG_ICELAKE || CONFIG_SUECREEK || CONFIG_TIGERLAKE
 	trace_point(TRACE_BOOT_PLATFORM_ENTRY);
