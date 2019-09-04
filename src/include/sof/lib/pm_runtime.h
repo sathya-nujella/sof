@@ -93,6 +93,16 @@ void pm_runtime_put(enum pm_runtime_context context, uint32_t index);
  */
 void pm_runtime_put_sync(enum pm_runtime_context context, uint32_t index);
 
+/**
+ * \brief Reports state of the power managed resource.
+ *
+ * @param context Type of power management context.
+ * @param index Index of the resource.
+ *
+ * @return true if the resource is active, false otherwise.
+ */
+bool pm_runtime_active(enum pm_runtime_context context, uint32_t index);
+
 /** @}*/
 
 #endif /* __SOF_LIB_PM_RUNTIME_H__ */

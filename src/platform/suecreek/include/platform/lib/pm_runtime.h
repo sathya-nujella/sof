@@ -43,6 +43,16 @@ void platform_pm_runtime_get(uint32_t context, uint32_t index, uint32_t flags);
  */
 void platform_pm_runtime_put(uint32_t context, uint32_t index, uint32_t flags);
 
+/**
+ * \brief Reports state of the power managed resource.
+ *
+ * @param context Type of power management context.
+ * @param index Index of the resource.
+ *
+ * @return true if the resource is active, false otherwise.
+ */
+bool platform_pm_runtime_active(uint32_t context, uint32_t index);
+
 #endif /* __PLATFORM_LIB_PM_RUNTIME_H__ */
 
 #else

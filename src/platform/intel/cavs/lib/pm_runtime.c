@@ -351,6 +351,11 @@ void platform_pm_runtime_put(enum pm_runtime_context context, uint32_t index,
 	}
 }
 
+bool platform_pm_runtime_active(uint32_t context, uint32_t index)
+{
+	return false;
+}
+
 #if CONFIG_APOLLOLAKE || CONFIG_CANNONLAKE
 void platform_pm_runtime_power_off(void)
 {
