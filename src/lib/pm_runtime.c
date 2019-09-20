@@ -72,3 +72,13 @@ void pm_runtime_put_sync(enum pm_runtime_context context, uint32_t index)
 		break;
 	}
 }
+
+bool pm_runtime_active(enum pm_runtime_context context, uint32_t index)
+{
+	tracev_pm("pm_runtime_active()");
+
+	switch (context) {
+	default:
+		return platform_pm_runtime_active(context, index);
+	}
+}

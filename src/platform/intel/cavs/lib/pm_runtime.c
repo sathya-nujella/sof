@@ -12,6 +12,8 @@
  * \author Tomasz Lauda <tomasz.lauda@linux.intel.com>
  */
 
+#include <sof/debug/panic.h>
+#include <sof/drivers/interrupt.h>
 #include <sof/lib/alloc.h>
 #include <sof/lib/dai.h>
 #include <sof/lib/io.h>
@@ -60,6 +62,25 @@ static inline void cavs_pm_runtime_force_host_dma_l1_exit(void)
 	}
 
 	spin_unlock_irq(_prd->lock, flags);
+}
+
+static inline void cavs_pm_runtime_request_dsp_d0(uint32_t req)
+{
+	uint32_t flags;
+	struct cavs_pm_runtime_data *pprd = _prd->platform_data;
+
+	irq_local_disable(flags);
+
+	req ? ++pprd->dsp_d0_sref : --pprd->dsp_d0_sref;
+
+	irq_local_enable(flags);
+}
+
+static inline bool cavs_pm_runtime_dsp_d0_active(void)
+{
+	struct cavs_pm_runtime_data *pprd =
+			(struct cavs_pm_runtime_data *)_prd->platform_data;
+	return pprd->dsp_d0_sref > 0;
 }
 
 #if CONFIG_CAVS_SSP
@@ -277,7 +298,7 @@ static inline void cavs_pm_runtime_core_en_memory(uint32_t index)
 
 void platform_pm_runtime_init(struct pm_runtime_data *prd)
 {
-	struct platform_pm_runtime_data *pprd;
+	struct cavs_pm_runtime_data *pprd;
 
 	_prd = prd;
 
@@ -311,6 +332,9 @@ void platform_pm_runtime_get(enum pm_runtime_context context, uint32_t index,
 		break;
 	case CORE_MEMORY_POW:
 		cavs_pm_runtime_core_en_memory(index);
+		break;
+	case DSP_D0:
+		cavs_pm_runtime_request_dsp_d0(1);
 		break;
 	default:
 		break;
@@ -346,9 +370,24 @@ void platform_pm_runtime_put(enum pm_runtime_context context, uint32_t index,
 	case CORE_MEMORY_POW:
 		cavs_pm_runtime_core_dis_memory(index);
 		break;
+	case DSP_D0:
+		cavs_pm_runtime_request_dsp_d0(0);
+		break;
 	default:
 		break;
 	}
+}
+
+bool platform_pm_runtime_active(uint32_t context, uint32_t index)
+{
+	switch (context) {
+	case DSP_D0:
+		return cavs_pm_runtime_dsp_d0_active();
+	default:
+		assert(false); /* unsupported query */
+		return false;
+	}
+
 }
 
 #if CONFIG_APOLLOLAKE || CONFIG_CANNONLAKE

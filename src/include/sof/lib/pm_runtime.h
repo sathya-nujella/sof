@@ -48,6 +48,7 @@ enum pm_runtime_context {
 	DMIC_POW,			/**< DMIC Power */
 	DW_DMAC_CLK,			/**< DW DMAC Clock */
 	CORE_MEMORY_POW,		/**< Core Memory power */
+	DSP_D0				/**< DSP in D0 state */
 };
 
 /** \brief Runtime power management data. */
@@ -92,6 +93,16 @@ void pm_runtime_put(enum pm_runtime_context context, uint32_t index);
  * \param[in] index Index of the device.
  */
 void pm_runtime_put_sync(enum pm_runtime_context context, uint32_t index);
+
+/**
+ * \brief Reports state of the power managed resource.
+ *
+ * @param context Type of power management context.
+ * @param index Index of the resource.
+ *
+ * @return true if the resource is active, false otherwise.
+ */
+bool pm_runtime_active(enum pm_runtime_context context, uint32_t index);
 
 /** @}*/
 
